@@ -23,11 +23,11 @@ Route::get('/posts', 'HomeController@posts')->name('posts');
 
 
 
-//Export And Import Excel 
+//Export and Import Excel 
 Route::get('product_import_export', 'ProductController@product_import_export')->name('product_import_export');
 
-//export url for product database
+//Export  for Product database
 Route::get('downloadExcel/{type}', 'ProductController@downloadExcel');
 
-//import excel file
+//Import Excel file
 Route::post('importExcel', 'ProductController@importExcel');
