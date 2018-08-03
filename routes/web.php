@@ -26,7 +26,7 @@ Route::get('/posts', 'HomeController@posts')->name('posts');
 //Export and Import Excel 
 Route::get('product_import_export', 'ProductController@product_import_export')->name('product_import_export');
 
-//Export  for Product database
+//Export Excel File of Product database
 Route::get('downloadExcel/{type}', 'ProductController@downloadExcel');
 
 //Import Excel file
