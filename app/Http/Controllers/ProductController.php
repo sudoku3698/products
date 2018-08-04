@@ -81,18 +81,21 @@ class ProductController extends Controller
 					  }	
                 }
             });
-            //ON DUPLICATE KEY UPDATE product_uuid=values(product_uuid)
+
+            /*ON DUPLICATE KEY UPDATE product_color=values(product_color),product_name=values(product_name),product_url=values(product_url),product_sku=values(product_sku),product_description=values(product_description),product_size=values(product_size)
+            */
             $Product_result=Product::insertOnDuplicateKey($product_data, ['product_color','product_name','product_url','product_sku','product_description','product_size']);
+            //dd($Product_result);
             // print_r($Product_result);
             // exit;
         }
         if(count($product_data)>0)
         {
         	if($final_error){
-        		return redirect()->back()->with('success', $Product_result.' columns affected')->with('errors',$final_error);
+        		return redirect()->back()->with('success', $Product_result.' rows affected')->with('errors',$final_error);
         	}else
         	{
-        		return redirect()->back()->with('success', $Product_result.' columns affected');
+        		return redirect()->back()->with('success', $Product_result.' rows affected');
         	}
         	
         }else
