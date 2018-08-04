@@ -67,11 +67,9 @@ class ProductController extends Controller
     	
         if($request->hasFile('import_file'))
         {
-
             Excel::load($request->file('import_file')->getRealPath(), function ($reader) use (&$inserted_count,&$updated_count,&$final_error,&$product_data) {
                 foreach ($reader->toArray() as $key => $row) 
                 {
-
                 	//Validation Check For Each Row
                     $validator = \Validator::make($row,(new StoreProductsValdation)->rules());
 					  if($validator->fails()) 
@@ -79,55 +77,28 @@ class ProductController extends Controller
 					  	$final_error[$key]=$validator->errors()->messages();
 					  }else
 					  {	
-
                         $product_data[]=$row;
-					  	//check if uuid is present or not if it is so then update orelse save
-					  	// $product=Product::where(['product_uuid'=>$row['product_uuid']])->first();
-					  	// if($product)
-					  	// {
-					  	// 	$product->product_name=$row['product_name'];
-					  	// 	$product->product_url=$row['product_url'];
-					  	// 	$product->product_sku=$row['product_sku'];
-					  	// 	$product->product_description=$row['product_description'];
-					  	// 	$product->product_color=$row['product_color'];
-					  	// 	$product->product_size=$row['product_size'];
-					  	// 	$product->save();
-					  	// 	$updated_count++;
-					  	// }else
-					  	// {
-					  	// 	$product=new Product();
-						  // 	$product->product_name=$row['product_name'];
-					  	// 	$product->product_url=$row['product_url'];
-					  	// 	$product->product_sku=$row['product_sku'];
-					  	// 	$product->product_description=$row['product_description'];
-					  	// 	$product->product_color=$row['product_color'];
-					  	// 	$product->product_size=$row['product_size'];
-					  	// 	$product->product_uuid=$row['product_uuid'];
-					  	// 	$product->save();
-					  	// 	$inserted_count++;
-					  	// }
 					  }	
                 }
-                
             });
             //ON DUPLICATE KEY UPDATE product_uuid=values(product_uuid)
-            $Product_result=Product::insertOnDuplicateKey($product_data, ['product_uuid','product_color','product_name','product_url','product_sku','product_description','product_size']);
-            print_r($Product_result);
-            exit;
+            $Product_result=Product::insertOnDuplicateKey($product_data, ['product_color','product_name','product_url','product_sku','product_description','product_size']);
+            // print_r($Product_result);
+            // exit;
         }
-        if($inserted_count>0 || $updated_count>0)
-		        {
-		        	if($final_error){
-		        		return redirect()->back()->with('success', $inserted_count.' columns inserted and '.$updated_count.' columns updated')->with('errors',$final_error);
-		        	}else
-		        	{
-		        		return redirect()->back()->with('success', $inserted_count.' columns inserted and '.$updated_count.' columns updated');
-		        	}
-		        	
-		        }else
-		        {
-		        	return redirect()->back()->with('errors',$final_error);
-		        }
+        if(count($product_data)>0)
+        {
+        	if($final_error){
+        		return redirect()->back()->with('success', $Product_result.' columns affected')->with('errors',$final_error);
+        	}else
+        	{
+        		return redirect()->back()->with('success', $Product_result.' columns affected');
+        	}
+        	
+        }else
+        {
+        	return redirect()->back()->with('errors',$final_error);
+        }
         
     }
 }
