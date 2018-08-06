@@ -8,7 +8,7 @@ use App\Product;
 use DB;
 use Session;
 use Excel;
-use App\Http\Requests\StoreProductData;
+use App\Http\Requests\StoreProductRules;
 
 class ProductController extends Controller
 {
@@ -69,7 +69,7 @@ class ProductController extends Controller
                 foreach ($reader->toArray() as $key => $row) 
                 {
                     //Validation Check For Each Row
-                    $validator = \Validator::make($row,(new StoreProductData)->rules());
+                    $validator = \Validator::make($row,(new StoreProductRules)->rules());
                       if($validator->fails()) 
                       {
                         $final_error[$key]=$validator->errors()->messages();
