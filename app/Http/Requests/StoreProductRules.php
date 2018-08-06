@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use App\Rules\ValidUrl;
 
 class StoreProductRules extends FormRequest
 {
@@ -25,12 +26,20 @@ class StoreProductRules extends FormRequest
     {
         return [
             'product_name' => 'required',
-            'product_url' => 'required|regex:/^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/',
+            'product_url' => ['required',new ValidUrl],
             'product_sku' => 'required',
             'product_description' => 'required',
             'product_color' => 'required',
             'product_size' => 'required',
             'product_uuid' => 'required'
+        ];
+    }
+
+    public function messages()
+    {
+        return [
+            'product_name.required' => 'Field product_name is required',
+            'product_url.required'  => 'Field product_url is required',
         ];
     }
 }
