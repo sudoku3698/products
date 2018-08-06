@@ -8,6 +8,7 @@ use App\Product;
 use DB;
 use Session;
 use Excel;
+use App\Http\Requests\StoreProductData;
 
 class ProductController extends Controller
 {
@@ -31,7 +32,7 @@ class ProductController extends Controller
 
             $excel->sheet('mySheet', function($sheet)
             {
-            	$product=Product::all();
+            	//$product=Product::all();
             	$reload=array();
                 $reload[] = array(
                 	'product_name' => "", 
@@ -58,76 +59,52 @@ class ProductController extends Controller
      */
     public function importExcel(Request $request)
     {
-    	$inserted_count=0;
-    	$updated_count=0;
-    	$final_error=array();
-    	
+        $inserted_count=0;
+        $updated_count=0;
+        $final_error=array();
+        $product_data=array();
+        
         if($request->hasFile('import_file'))
         {
-
-            Excel::load($request->file('import_file')->getRealPath(), function ($reader) use (&$inserted_count,&$updated_count,&$final_error) {
+            Excel::load($request->file('import_file')->getRealPath(), function ($reader) use (&$inserted_count,&$updated_count,&$final_error,&$product_data) {
                 foreach ($reader->toArray() as $key => $row) 
                 {
-
-                	//Validation Check For Each Row
-                    $validator = \Validator::make($row, [
-					            'product_name' => 'required',
-					            'product_url' => 'required|regex:/^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/',
-					            'product_sku' => 'required',
-					            'product_description' => 'required',
-					            'product_color' => 'required',
-					            'product_size' => 'required',
-					            'product_uuid' => 'required'
-					            //'product_uuid' => 'required|unique:products,product_uuid'
-					        ]);
-					  if($validator->fails()) 
-					  {
-					  	$final_error[$key]=$validator->errors()->messages();
-					  }else
-					  {	
-					  	//check if uuid is present or not if it is so then update orelse save
-					  	$product=Product::where(['product_uuid'=>$row['product_uuid']])->first();
-					  	if($product)
-					  	{
-					  		$product->product_name=$row['product_name'];
-					  		$product->product_url=$row['product_url'];
-					  		$product->product_sku=$row['product_sku'];
-					  		$product->product_description=$row['product_description'];
-					  		$product->product_color=$row['product_color'];
-					  		$product->product_size=$row['product_size'];
-					  		$product->save();
-					  		$updated_count++;
-					  	}else
-					  	{
-					  		$product=new Product();
-						  	$product->product_name=$row['product_name'];
-					  		$product->product_url=$row['product_url'];
-					  		$product->product_sku=$row['product_sku'];
-					  		$product->product_description=$row['product_description'];
-					  		$product->product_color=$row['product_color'];
-					  		$product->product_size=$row['product_size'];
-					  		$product->product_uuid=$row['product_uuid'];
-					  		$product->save();
-					  		$inserted_count++;
-					  	}
-					  }	
+                    //Validation Check For Each Row
+                    $validator = \Validator::make($row,(new StoreProductData)->rules());
+                      if($validator->fails()) 
+                      {
+                        $final_error[$key]=$validator->errors()->messages();
+                      }else
+                      { 
+                        $product_data[]=$row;
+                      } 
                 }
-                
             });
+            /*ON DUPLICATE KEY UPDATE product_color=values(product_color),product_name=values(product_name),product_url=values(product_url),product_sku=values(product_sku),product_description=values(product_description),product_size=values(product_size)
+            
+            INSERT INTO `products`(`product_name`,`product_url`,`product_sku`,`product_description`,`product_color`,`product_size`,`product_uuid`) VALUES\n
+            (?,?,?,?,?,?,?), (?,?,?,?,?,?,?)\n
+            ON DUPLICATE KEY UPDATE `product_color` = VALUES(`product_color`), `product_name` = VALUES(`product_name`), `product_url` = VALUES(`product_url`), `product_sku` = VALUES(`product_sku`), `product_description` = VALUES(`product_description`), `product_size` = VALUES(`product_size`)
+            returns 1 on insert and 2 on update 
+            */
+            $Product_result=Product::insertOnDuplicateKey($product_data, ['product_color','product_name','product_url','product_sku','product_description','product_size']);
+            //dd($Product_result);
+            // print_r($Product_result);
+            // exit;
         }
-        if($inserted_count>0 || $updated_count>0)
-		        {
-		        	if($final_error){
-		        		return redirect()->back()->with('success', $inserted_count.' columns inserted and '.$updated_count.' columns updated')->with('errors',$final_error);
-		        	}else
-		        	{
-		        		return redirect()->back()->with('success', $inserted_count.' columns inserted and '.$updated_count.' columns updated');
-		        	}
-		        	
-		        }else
-		        {
-		        	return redirect()->back()->with('errors',$final_error);
-		        }
+        if(count($product_data)>0)
+        {
+            if($final_error){
+                return redirect()->back()->with('success', $Product_result.' rows affected')->with('errors',$final_error);
+            }else
+            {
+                return redirect()->back()->with('success', $Product_result.' rows affected');
+            }
+            
+        }else
+        {
+            return redirect()->back()->with('errors',$final_error);
+        }
         
     }
 }
