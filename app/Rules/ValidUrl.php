@@ -28,7 +28,7 @@ class ValidUrl implements Rule
         if (!preg_match('/^((?:https?\:\/\/|www\.)(?:[-a-z0-9]+\.)*[-a-z0-9]+.*)$/',
                 $value))
         {
-         return false;
+         return false; 
         }
         return true;
     }
