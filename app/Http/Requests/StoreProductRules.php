@@ -40,6 +40,11 @@ class StoreProductRules extends FormRequest
         return [
             'product_name.required' => 'Field product_name is required',
             'product_url.required'  => 'Field product_url is required',
+            'product_sku.required'  => 'Field product_sku is required',
+            'product_description.required'  => 'Field product_description is required',
+            'product_color.required'  => 'Field product_color is required',
+            'product_size.required'  => 'Field product_size is required',
+            'product_uuid.required'  => 'Field product_uuid is required',
         ];
     }
 }
