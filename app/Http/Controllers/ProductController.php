@@ -86,7 +86,7 @@ class ProductController extends Controller
             ON DUPLICATE KEY UPDATE `product_color` = VALUES(`product_color`), `product_name` = VALUES(`product_name`), `product_url` = VALUES(`product_url`), `product_sku` = VALUES(`product_sku`), `product_description` = VALUES(`product_description`), `product_size` = VALUES(`product_size`)
             returns 1 on insert and 2 on update 
             */
-            $Product_result=Product::insertOnDuplicateKey($product_data, ['product_color','product_name','product_url','product_sku','product_description','product_size']);
+            $Product_result=Product::InsertOrUpdateInBulk($product_data);
         }
         if(count($product_data)>0)
         {
