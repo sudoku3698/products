@@ -66,15 +66,20 @@ class ProductController extends Controller
         if($request->hasFile('import_file'))
         {
             Excel::load($request->file('import_file')->getRealPath(), function ($reader) use (&$inserted_count,&$updated_count,&$final_error,&$product_data) {
-                
                 //return errors array and valid product_data array
                 $result=Product::validOrInvalidProductDataRequest($reader->toArray());
 
                 $final_error=$result['final_error'];
                 $product_data=$result['product_data'];
             });
-
-            $Product_result=Product::InsertOrUpdateInBulk($product_data);
+            if(!empty($product_data))
+            {
+                $Product_result=Product::InsertOrUpdateInBulk($product_data);
+            }else
+            {
+                return redirect()->back()->with('error',"Empty data in excel sheet")->with('errors',$final_error);
+            }
+            
         }
         if(count($product_data)>0)
         {
@@ -89,6 +94,5 @@ class ProductController extends Controller
         {
             return redirect()->back()->with('errors',$final_error);
         }
-        
     }
 }

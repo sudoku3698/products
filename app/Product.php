@@ -35,7 +35,7 @@ class Product extends Model
      *
      * @param  product data array
      * 
-     * @return affected rows
+     * @return affected rows or false
      */
      public static function InsertOrUpdateInBulk($product_data)
      {
@@ -46,7 +46,12 @@ class Product extends Model
         ON DUPLICATE KEY UPDATE `product_color` = VALUES(`product_color`), `product_name` = VALUES(`product_name`), `product_url` = VALUES(`product_url`), `product_sku` = VALUES(`product_sku`), `product_description` = VALUES(`product_description`), `product_size` = VALUES(`product_size`)
         returns 1 on insert and 2 on update 
         */
-     	return self::insertOnDuplicateKey($product_data, ['product_color','product_name','product_url','product_sku','product_description','product_size']);
+        if($product_data)
+        {
+            return self::insertOnDuplicateKey($product_data, ['product_color','product_name','product_url','product_sku','product_description','product_size']);
+        }
+        return false;
+     	
      }
 
     //check valid and invalid data
