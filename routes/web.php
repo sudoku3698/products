@@ -31,3 +31,5 @@ Route::get('downloadExcel/{type}', 'ProductController@downloadExcel');
 
 //Import Excel file
 Route::post('importExcel', 'ProductController@importExcel');
+
+Route::get('test_importExcel','ProductController@test_importExcel')->name('test_importExcel');

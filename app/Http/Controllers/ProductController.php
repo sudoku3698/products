@@ -12,12 +12,6 @@ use App\Library\Services\FileOperations;
 
 class ProductController extends Controller
 {
-    protected $FileOperations;
-    public function __construct(FileOperations $FileOperations) 
-    {
-        $this->FileOperations=$FileOperations;
-    }
-
 	//view page for import and export
     public function product_import_export()
     {
@@ -32,9 +26,9 @@ class ProductController extends Controller
      * 
      * @return download excel file
      */
-    public function downloadExcel($type)
+    public function downloadExcel(FileOperations $FileOperations,$type)
     {
-        return $this->FileOperations->get_external_file("http://127.0.0.1:8787/Final_product.xls");
+        return $FileOperations->get_external_file("http://127.0.0.1:8787/Final_product.xls");
 
         // return Excel::create('product_export_import', function($excel){
 
@@ -47,6 +41,11 @@ class ProductController extends Controller
         // })->download($type);
     }
 
+
+    public function test_importExcel(FileOperations $FileOperations)
+    {
+        return $FileOperations->test_get_external_file("http://127.0.0.1:8787/Final_product.xls");
+    }
 
     //Import excel sheet 
     /**
@@ -65,6 +64,7 @@ class ProductController extends Controller
         
         if($request->hasFile('import_file'))
         {
+            //storage_path().'/app/uploads/excel.xls;
             Excel::load($request->file('import_file')->getRealPath(), function ($reader) use (&$inserted_count,&$updated_count,&$final_error,&$product_data) {
                 //return errors array and valid product_data array
                 $result=Product::validOrInvalidProductDataRequest($reader->toArray());

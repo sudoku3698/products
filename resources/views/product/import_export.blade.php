@@ -44,6 +44,7 @@
 				    </div>
 					@endif
 				<br />
+				<a href="{{ route('test_importExcel') }}"><button >Download Excel</button></a>
 				<a href="{{ URL::to('downloadExcel/xls') }}"><button >Download Excel xls</button></a>
 				<a href="{{ URL::to('downloadExcel/xlsx') }}"><button c>Download Excel xlsx</button></a>
 				<a href="{{ URL::to('downloadExcel/csv') }}"><button >Download CSV</button></a>
