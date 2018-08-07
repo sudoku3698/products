@@ -8,9 +8,16 @@ use App\Product;
 use DB;
 use Session;
 use Excel;
+use App\Library\Services\FileOperations;
 
 class ProductController extends Controller
 {
+    protected $FileOperations;
+    public function __construct(FileOperations $FileOperations) 
+    {
+        $this->FileOperations=$FileOperations;
+    }
+
 	//view page for import and export
     public function product_import_export()
     {
@@ -27,15 +34,17 @@ class ProductController extends Controller
      */
     public function downloadExcel($type)
     {
-        return Excel::create('product_export_import', function($excel){
+        return $this->FileOperations->get_external_file("http://127.0.0.1:8787/Final_product.xls");
 
-            $excel->sheet('mySheet', function($sheet)
-            {
-            	$reload=array();
-                $reload[] = Product::exportProductDataColumnArray();
-                $sheet->fromArray($reload);
-            });
-        })->download($type);
+        // return Excel::create('product_export_import', function($excel){
+
+        //     $excel->sheet('mySheet', function($sheet)
+        //     {
+        //     	$reload=array();
+        //         $reload[] = Product::exportProductDataColumnArray();
+        //         $sheet->fromArray($reload);
+        //     });
+        // })->download($type);
     }
 
 
