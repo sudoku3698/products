@@ -5,6 +5,7 @@ namespace App;
 use Illuminate\Database\Eloquent\Model;
 use Yadakhov\InsertOnDuplicateKey;
 use App\Http\Requests\StoreProductRules;
+use Excel;
 
 class Product extends Model
 {
@@ -27,6 +28,29 @@ class Product extends Model
                 	'product_size' => "",
                 	'product_uuid' => ""
                 	);
+    }
+
+
+    //insert and update product data in bulk
+    /**
+     * import excel file
+     *
+     * @param  file_path
+     * 
+     * @return return valid data array and errors array
+     */
+    public static function load_excel_data($get_file_path)
+    {   
+        $result=array();
+        $inserted_count=0;
+        $updated_count=0;
+        $final_error=array();
+        $product_data=array();
+        Excel::load($get_file_path, function ($reader) use (&$inserted_count,&$updated_count,&$final_error,&$product_data,&$result) {
+                //return errors array and valid product_data array
+                $result=self::validOrInvalidProductDataRequest($reader->toArray());
+            });
+        return $result;
     }
 
     //insert and update product data in bulk
