@@ -41,7 +41,14 @@ class ProductController extends Controller
         // })->download($type);
     }
 
-
+    //Export excel sheet
+    /**
+     * Download Excel FIle 
+     *
+     * @param  $url
+     * 
+     * @return download excel file and put in local server
+     */
     public function test_importExcel(FileOperations $FileOperations)
     {
         return $FileOperations->test_get_external_file("http://127.0.0.1:8787/Final_product.xls");
