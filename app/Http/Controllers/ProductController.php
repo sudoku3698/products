@@ -64,40 +64,28 @@ class ProductController extends Controller
      */
     public function importExcel(Request $request)
     {
-        $inserted_count=0;
-        $updated_count=0;
-        $final_error=array();
-        $product_data=array();
-        
         if($request->hasFile('import_file'))
         {
-            $result=Product::load_excel_data($request->file('import_file')->getRealPath());
-            $final_error=$result['final_error'];
-            $product_data=$result['product_data'];
-            if(!empty($product_data))
-            {
-                $Product_result=Product::InsertOrUpdateInBulk($product_data);
-            }else
-            {
-                return redirect()->back()->with('error',"Empty data in excel sheet")->with('errors',$final_error);
-            }
-            
+            $result=Product::importProductData($request->file('import_file')->getRealPath()); 
         }else
         {
             return redirect()->back()->with('error','Please import valid file');
         }
-        if(count($product_data)>0)
+
+
+        if($result['Product_result']>0)
         {
-            if($final_error){
-                return redirect()->back()->with('success', $Product_result.' rows affected')->with('errors',$final_error);
-            }else
-            {
-                return redirect()->back()->with('success', $Product_result.' rows affected');
-            }
+          if($result['final_error'])
+          {
+            return redirect()->back()->with('success', $result['Product_result'].' rows affected')->with('errors',$result['final_error']);
+          }else
+          {
+            return redirect()->back()->with('success', $result['Product_result'].' rows affected');
+          }
             
         }else
         {
-            return redirect()->back()->with('errors',$final_error);
+            return redirect()->back()->with('error',"No rows Affected")->with($result['final_error']?'errors':'',$result['final_error']);
         }
     }
 }

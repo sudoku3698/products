@@ -30,6 +30,36 @@ class Product extends Model
                 	);
     }
 
+    //insert and update product data in bulk
+    /**
+     * import data from excel file to mysql database
+     *
+     * @param  file_path
+     * 
+     * @return return valid data array and errors array
+     */
+    public static function importProductData($file)
+    {
+        $product_data=array();
+        $response_data=array();
+        $response_data['Product_result']=0;
+        $response_data['final_error']=array();
+        $response_data['error']="";
+
+        $result=self::load_excel_data($file);
+        $response_data['final_error']=$result['final_error'];
+        $product_data=$result['product_data'];
+        if(!empty($product_data))
+        {
+            $response_data['Product_result']=Product::InsertOrUpdateInBulk($product_data);
+        }else
+        {
+            $response_data['error']="Empty data in excel sheet";
+        }
+
+        return $response_data;
+    }
+
 
     //insert and update product data in bulk
     /**
