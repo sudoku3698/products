@@ -66,26 +66,28 @@ class ProductController extends Controller
     {
         if($request->hasFile('import_file'))
         {
-            $result=Product::importProductData($request->file('import_file')->getRealPath()); 
+            //dd('ok');
+            $result=Product::importProductData(storage_path().'/app/uploads/A.xls');
+            //$result=Product::importProductData($request->file('import_file')); 
+
+            if($result['Product_result']>0)
+            {
+              if($result['final_error'])
+              {
+                return redirect()->back()->with('success', $result['Product_result'].' rows affected')->with('errors',$result['final_error']);
+              }else
+              {
+                return redirect()->back()->with('success', $result['Product_result'].' rows affected');
+              }
+                
+            }else
+            {
+                return redirect()->back()->with('error',!empty($result['error'])?$result['error']:"Data is up to date")->with($result['final_error']?'errors':'',$result['final_error']);
+            }
         }else
         {
+            dd('not ok');
             return redirect()->back()->with('error','Please import valid file');
-        }
-
-
-        if($result['Product_result']>0)
-        {
-          if($result['final_error'])
-          {
-            return redirect()->back()->with('success', $result['Product_result'].' rows affected')->with('errors',$result['final_error']);
-          }else
-          {
-            return redirect()->back()->with('success', $result['Product_result'].' rows affected');
-          }
-            
-        }else
-        {
-            return redirect()->back()->with('error',"No rows Affected")->with($result['final_error']?'errors':'',$result['final_error']);
         }
     }
 }

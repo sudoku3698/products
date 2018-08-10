@@ -33,3 +33,8 @@ Route::get('downloadExcel/{type}', 'ProductController@downloadExcel');
 Route::post('importExcel', 'ProductController@importExcel');
 
 Route::get('test_importExcel','ProductController@test_importExcel')->name('test_importExcel');
+
+Route::get('/foo', function () {
+    $exitCode = Artisan::call('import:products');
+    print_r($exitCode);
+});

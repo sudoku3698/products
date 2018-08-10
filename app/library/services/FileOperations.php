@@ -30,7 +30,7 @@ class FileOperations
         curl_close($ch);
         header('Content-Type: application/octet-stream');
         header("Content-Transfer-Encoding: Binary"); 
-        header("Content-disposition: attachment; filename=\"product_export_import.xls\""); 
+        header("Content-disposition: attachment; filename=\"Final_product.xls.xls\""); 
         return $data;
     }
 }
