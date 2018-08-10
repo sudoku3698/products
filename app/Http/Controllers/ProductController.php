@@ -69,7 +69,6 @@ class ProductController extends Controller
             //dd('ok');
             $result=Product::importProductData(storage_path().'/app/uploads/A.xls');
             //$result=Product::importProductData($request->file('import_file')); 
-
             if($result['Product_result']>0)
             {
               if($result['final_error'])
