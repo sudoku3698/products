@@ -33,7 +33,13 @@ class Product extends Model
                 	);
     }
 
-
+     /**
+     * return list of allowed extenstions
+     *
+     * @param  null
+     * 
+     * @return return array
+     */
     public static function allowedFileExtentionsForProductImport()
     {
         return array('csv','xls','xlsx');
@@ -56,15 +62,7 @@ class Product extends Model
         $response_data['Product_result']=0;
         $response_data['final_error']=array();
         $response_data['error']="";
-        $info=pathinfo($file);
-        if(isset($info['extension']))
-        {
-            $extention=$info['extension'];
-        }else
-        {
-            $extention=$file->getClientOriginalExtension();
-        }
-        
+        $extention=self::getFileExtention($file);
         if(in_array($extention, self::allowedFileExtentionsForProductImport()))
         {
             $result=self::load_excel_data($file);
@@ -72,13 +70,24 @@ class Product extends Model
             $response_data['final_error']=$result['final_error'];
         }else
         {
-            //dd('Invalid File');
-            $response_data['error']="Not a valid file";
-            
+            $response_data['error']="Not a valid file";   
         }
         return $response_data;
     }
 
+    public static function getFileExtention($get_file_path)
+    {
+        $info=pathinfo($get_file_path);
+        if(isset($info['extension']))
+        {
+            $extention=$info['extension'];
+        }else
+        {
+            $extention=$get_file_path->getClientOriginalExtension();
+        }
+
+        return $extention;
+    }
 
     //insert and update product data in bulk
     /**
@@ -91,19 +100,12 @@ class Product extends Model
     public static function load_excel_data($get_file_path)
     { 
         $extention="";
+        $count=0;
+        $co=0;
         $result=array();
         $result['product_data']=array();
         $result['final_error']=array();
-        $info=pathinfo($get_file_path);
-        $count=0;
-        $co=0;
-        if(isset($info['extension']))
-        {
-            $extention=$info['extension'];
-        }else
-        {
-            $extention=$get_file_path->getClientOriginalExtension();
-        }
+        $extention=self::getFileExtention($get_file_path);
         if(in_array($extention, self::allowedFileExtentionsForProductImport()))
         {
             $get_file_path=is_object($get_file_path)?$get_file_path->getRealPath():$get_file_path;
@@ -113,7 +115,7 @@ class Product extends Model
                 $result=self::validOrInvalidProductDataRequest($reader->toArray());
 
                 //import data in chunk into the database
-                foreach(array_chunk($result['product_data'], 500) as $value){
+                foreach(array_chunk($result['product_data'], 600) as $value){
                    $co=self::insertOnDuplicateKey($value, ['product_color','product_name','product_url','product_sku','product_description','product_size']);
                    $count=$count+$co;
                   }

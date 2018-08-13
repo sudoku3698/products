@@ -64,6 +64,9 @@ class ProductController extends Controller
      */
     public function importExcel(Request $request)
     {
+        // echo "<pre>";
+        // print_r($request->all());
+        // exit;
         if($request->hasFile('import_file'))
         {
             //dd('ok');
