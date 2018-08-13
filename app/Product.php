@@ -115,7 +115,7 @@ class Product extends Model
                 $result=self::validOrInvalidProductDataRequest($reader->toArray());
 
                 //import data in chunk into the database
-                foreach(array_chunk($result['product_data'], 600) as $value){
+                foreach(array_chunk($result['product_data'], config('constant.chuncks')) as $value){
                    $co=self::insertOnDuplicateKey($value, ['product_color','product_name','product_url','product_sku','product_description','product_size']);
                    $count=$count+$co;
                   }
