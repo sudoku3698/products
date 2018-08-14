@@ -101,7 +101,6 @@ class Product extends Model
     { 
         $extention="";
         $count=0;
-        $co=0;
         $result=array();
         $result['product_data']=array();
         $result['final_error']=array();
@@ -109,12 +108,13 @@ class Product extends Model
         if(in_array($extention, self::allowedFileExtentionsForProductImport()))
         {
             $get_file_path=is_object($get_file_path)?$get_file_path->getRealPath():$get_file_path;
-            Excel::load($get_file_path, function ($reader) use (&$inserted_count,&$updated_count,&$final_error,&$product_data,&$result,&$count,&$co) {
+            Excel::load($get_file_path, function ($reader) use (&$inserted_count,&$updated_count,&$final_error,&$product_data,&$result,&$count) {
 
                 //return errors array and valid product_data array
                 $result=self::validOrInvalidProductDataRequest($reader->toArray());
 
                 //import data in chunk into the database
+                $co=0;
                 foreach(array_chunk($result['product_data'], config('constant.chuncks')) as $value){
                    $co=self::insertOnDuplicateKey($value, ['product_color','product_name','product_url','product_sku','product_description','product_size']);
                    $count=$count+$co;
